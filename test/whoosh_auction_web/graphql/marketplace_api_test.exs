@@ -5,6 +5,21 @@ defmodule WhooshAuctionWeb.GraphQL.MarketplaceApiTest do
   alias WhooshAuction.Marketplace.Item
   alias WhooshAuction.Marketplace.ItemSupervisor
 
+  @items_list [
+    Item.new("1", "Item 1", "Some cool thing", "$1"),
+    Item.new("2", "Item 2", "Another cool thing", "$2")
+  ]
+
+  @get_item_query """
+  query getItem($id: ID!) {
+    get_item(id: $id) {
+      id
+      name
+      price
+    }
+  }
+  """
+
   describe "The items query" do
     @list_all_items_query """
     query {
@@ -39,6 +54,33 @@ defmodule WhooshAuctionWeb.GraphQL.MarketplaceApiTest do
                %{"id" => "1", "name" => "Item 1", "price" => "$1"},
                %{"id" => "2", "name" => "Item 2", "price" => "$2"}
              ]
+    end
+  end
+
+  describe "the specific item" do
+    test "given an item ID, when call the query, should return a specific item", %{conn: conn} do
+      start_supervised({ItemSupervisor, @items_list})
+
+      result = gql_api(conn, @get_item_query, %{id: "2"})
+
+      assert %{
+               "data" => %{
+                 "get_item" => %{"id" => "2", "name" => "Item 2", "price" => "$2"}
+               }
+             } = result
+    end
+
+    test "given an item ID that does not exist, when call the query, should return error", %{conn: conn} do
+      start_supervised({ItemSupervisor, @items_list})
+
+      result = gql_api(conn, @get_item_query, %{id: "4444"})
+
+      assert %{
+               "data" => %{"get_item" => nil},
+               "errors" => [
+                 %{"locations" => [%{"column" => 3, "line" => 2}], "message" => "not_found", "path" => ["get_item"]}
+               ]
+             } = result
     end
   end
 

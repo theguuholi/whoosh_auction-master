@@ -14,5 +14,11 @@ defmodule WhooshAuctionWeb.GraphQL.Schema do
     field :items, list_of(:item) do
       resolve &ItemResolver.list_items/3
     end
+
+    @desc "Get all items"
+    field :get_item, :item do
+      arg :id, non_null(:id)
+      resolve &ItemResolver.get_item/3
+    end
   end
 end

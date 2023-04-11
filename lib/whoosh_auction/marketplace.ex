@@ -4,6 +4,7 @@ defmodule WhooshAuction.Marketplace do
   """
 
   alias WhooshAuction.Marketplace.ItemDynamicSupervisor
+  alias WhooshAuction.Marketplace.ItemRegistry
 
   require Logger
 

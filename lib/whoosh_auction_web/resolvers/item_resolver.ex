@@ -9,4 +9,14 @@ defmodule WhooshAuctionWeb.GraphQL.ItemResolver do
   def list_items(_parent, _args, _resolution) do
     {:ok, Marketplace.list_items()}
   end
+
+  def get_item(_parent, %{id: id}, _resolution) do
+    result = Marketplace.get_item(id)
+
+    if is_map(result) do
+      {:ok, result}
+    else
+      result
+    end
+  end
 end
