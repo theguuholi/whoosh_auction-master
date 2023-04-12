@@ -32,6 +32,10 @@ defmodule WhooshAuction.Marketplace do
     end
   end
 
+
+  @doc """
+  This function will a new item.
+  """
   def create_item(item) do
     Item
     |> struct(item)
