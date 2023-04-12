@@ -4,6 +4,7 @@ defmodule WhooshAuction.Marketplace do
   """
 
   alias WhooshAuction.Marketplace.ItemDynamicSupervisor
+  alias WhooshAuction.Marketplace.Item
   alias WhooshAuction.Marketplace.ItemRegistry
 
   require Logger
@@ -29,5 +30,13 @@ defmodule WhooshAuction.Marketplace do
         Logger.info("Failed to call :get_item_details because: #{inspect(reason)}")
         {:error, :not_found}
     end
+  end
+
+  def create_item(item) do
+    Item
+    |> struct(item)
+    |> then(fn %{id: id} = item ->
+      (get_item(id) |> is_map() && :ok) || ItemDynamicSupervisor.add_item_to_supervisor(item)
+    end)
   end
 end

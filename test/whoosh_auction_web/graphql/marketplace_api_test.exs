@@ -84,6 +84,65 @@ defmodule WhooshAuctionWeb.GraphQL.MarketplaceApiTest do
     end
   end
 
+  describe "add a new item to the auction marketplace" do
+    test "given an item, when call the mutation, should create an item", %{conn: conn} do
+      start_supervised({ItemSupervisor, []})
+
+      %{"data" => %{"items" => fetched_items}} = gql_api(conn, @list_all_items_query)
+
+      assert Enum.sort(fetched_items) == []
+
+      query = """
+        mutation {
+          createItem(item:
+            {
+              id: "555",
+              name: "Test",
+              description: "Test Description",
+              price: "123"
+            }
+          )
+        }
+      """
+
+      result = gql_api(conn, query, %{})
+
+      assert %{"data" => %{"createItem" => "Item created"}} = result
+
+      %{"data" => %{"items" => fetched_items}} = gql_api(conn, @list_all_items_query)
+
+      assert Enum.sort(fetched_items) == [%{"id" => "555", "name" => "Test", "price" => "123"}]
+    end
+
+    test "given an item that already, when call the mutation, should not create an item", %{conn: conn} do
+      start_supervised({ItemSupervisor, []})
+
+      %{"data" => %{"items" => fetched_items}} = gql_api(conn, @list_all_items_query)
+
+      assert Enum.sort(fetched_items) == []
+
+      query = """
+        mutation {
+          createItem(item:
+            {
+              id: "555",
+              name: "Test",
+              description: "Test Description",
+              price: "123"
+            }
+          )
+        }
+      """
+
+      gql_api(conn, query, %{})
+      gql_api(conn, query, %{})
+
+      %{"data" => %{"items" => fetched_items}} = gql_api(conn, @list_all_items_query)
+
+      assert Enum.sort(fetched_items) == [%{"id" => "555", "name" => "Test", "price" => "123"}]
+    end
+  end
+
   defp gql_api(conn, query, variables \\ %{}) do
     conn
     |> post("/api", %{variables: variables, query: query})

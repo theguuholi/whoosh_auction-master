@@ -19,4 +19,9 @@ defmodule WhooshAuctionWeb.GraphQL.ItemResolver do
       result
     end
   end
+
+  def create_item(_parent, %{item: item}, _resolution) do
+    Marketplace.create_item(item)
+    {:ok, "Item created"}
+  end
 end

@@ -21,4 +21,12 @@ defmodule WhooshAuctionWeb.GraphQL.Schema do
       resolve &ItemResolver.get_item/3
     end
   end
+
+  mutation do
+    @desc "Create Item"
+    field :create_item, :string do
+      arg(:item, non_null(:item_input))
+      resolve(&ItemResolver.create_item/3)
+    end
+  end
 end

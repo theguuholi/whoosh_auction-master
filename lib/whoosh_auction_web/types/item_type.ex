@@ -7,4 +7,11 @@ defmodule WhooshAuctionWeb.GraphQL.ItemType do
     field :description, :string
     field :price, :string
   end
+
+  input_object :item_input do
+    field :id, :string
+    field :name, :string
+    field :description, :string
+    field :price, :string
+  end
 end
